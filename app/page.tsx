@@ -65,6 +65,12 @@ export default async function FeedPage({
             >
               Leaderboard
             </Link>
+            <Link
+              href="/docs"
+              className="rounded-full px-3 py-1 text-sm text-zinc-400 transition-colors hover:text-white"
+            >
+              Docs
+            </Link>
           </nav>
         </div>
       </header>
