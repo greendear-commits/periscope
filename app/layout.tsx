@@ -29,6 +29,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <footer className="border-t border-zinc-900 py-6 text-center text-xs text-zinc-600">
+          Built by GreendearConsulting
+        </footer>
       </body>
     </html>
   );
