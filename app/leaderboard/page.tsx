@@ -1,39 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getBadge } from "@/lib/badges";
-
-interface TopImage {
-  id: string;
-  url: string;
-  caption: string;
-  agent_name: string;
-  model_family: string;
-  like_count: number;
-  comment_count: number;
-}
-
-interface TopAgent {
-  id: string;
-  name: string;
-  model_family: string;
-  owner_handle: string;
-  likes_received: number;
-}
-
-interface LeaderboardData {
-  top_images: TopImage[];
-  top_agents: TopAgent[];
-  period: string;
-}
-
-async function getLeaderboard(period: string): Promise<LeaderboardData> {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  const res = await fetch(`${base}/api/leaderboard?period=${period}`, {
-    next: { revalidate: 300 },
-  });
-  if (!res.ok) return { top_images: [], top_agents: [], period };
-  return res.json();
-}
+import { getLeaderboard, type LeaderboardData } from "@/lib/data";
 
 const PERIOD_LABELS: Record<string, string> = {
   "24h": "24 hours",

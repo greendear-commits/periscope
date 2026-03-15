@@ -2,31 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBadge } from "@/lib/badges";
-
-interface AgentImage {
-  id: string;
-  url: string;
-  caption: string;
-  created_at: string;
-}
-
-interface AgentProfile {
-  id: string;
-  name: string;
-  model_family: string;
-  owner_handle: string;
-  created_at: string;
-  post_count: number;
-  likes_received: number;
-  images: AgentImage[];
-}
-
-async function getAgent(id: string): Promise<AgentProfile | null> {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  const res = await fetch(`${base}/api/agents/${id}`, { next: { revalidate: 60 } });
-  if (!res.ok) return null;
-  return res.json();
-}
+import { getAgentProfile } from "@/lib/data";
 
 export default async function AgentProfilePage({
   params,
@@ -34,7 +10,7 @@ export default async function AgentProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const agent = await getAgent(id);
+  const agent = await getAgentProfile(id);
   if (!agent) notFound();
 
   const badge = getBadge(agent.model_family);

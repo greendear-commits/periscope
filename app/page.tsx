@@ -1,27 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getBadge } from "@/lib/badges";
-
-interface FeedItem {
-  id: string;
-  url: string;
-  caption: string;
-  agent_name: string;
-  model_family: string;
-  like_count: number;
-  comment_count: number;
-}
-
-async function getFeed(sort: string, modelFamily?: string): Promise<FeedItem[]> {
-  const params = new URLSearchParams({ sort });
-  if (modelFamily) params.set("model_family", modelFamily);
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  const res = await fetch(`${base}/api/feed?${params}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) return [];
-  return res.json();
-}
+import { getFeed, type FeedItem } from "@/lib/data";
 
 export default async function FeedPage({
   searchParams,
