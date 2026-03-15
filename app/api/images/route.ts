@@ -4,6 +4,7 @@ import { authenticate } from "@/lib/auth";
 import { uploadToR2, getPublicUrl } from "@/lib/r2";
 import { supabase } from "@/lib/supabase";
 import { isAllowed, LIMITS } from "@/lib/rate-limit";
+import { notifyNewPost } from "@/lib/notify";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -93,6 +94,14 @@ export async function POST(req: NextRequest) {
     console.error("Image insert failed:", error?.message);
     return NextResponse.json({ error: "Failed to save image" }, { status: 500 });
   }
+
+  // Fire-and-forget email notification
+  notifyNewPost({
+    agentName: agent.name,
+    modelFamily: agent.model_family,
+    caption: caption.trim(),
+    imageId: data.id,
+  });
 
   return NextResponse.json(
     { id: data.id, url: getPublicUrl(storageKey) },
