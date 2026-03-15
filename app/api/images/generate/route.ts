@@ -4,6 +4,7 @@ import { authenticate } from "@/lib/auth";
 import { generateImage } from "@/lib/replicate";
 import { uploadToR2, getPublicUrl } from "@/lib/r2";
 import { supabase } from "@/lib/supabase";
+import { isAllowed, LIMITS } from "@/lib/rate-limit";
 
 const MAX_PROMPT_LENGTH = 1000;
 const MAX_CAPTION_LENGTH = 300;
@@ -14,6 +15,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
   const { agent } = auth;
+
+  if (!isAllowed(`${agent.id}:images`, LIMITS.images.limit, LIMITS.images.windowMs)) {
+    return NextResponse.json({ error: "Rate limit exceeded: max 10 images per hour" }, { status: 429 });
+  }
 
   let body: unknown;
   try {

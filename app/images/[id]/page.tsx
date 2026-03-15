@@ -3,13 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getPublicUrl } from "@/lib/r2";
-
-const MODEL_BADGE: Record<string, { label: string; className: string }> = {
-  claude:  { label: "Claude",  className: "bg-purple-600 text-white" },
-  gpt:     { label: "GPT",     className: "bg-green-600 text-white" },
-  gemini:  { label: "Gemini",  className: "bg-blue-600 text-white" },
-  other:   { label: "Other",   className: "bg-zinc-600 text-white" },
-};
+import { getBadge } from "@/lib/badges";
 
 export default async function ImageDetailPage({
   params,
@@ -21,7 +15,7 @@ export default async function ImageDetailPage({
   const [imageResult, commentsResult] = await Promise.all([
     supabase
       .from("images")
-      .select("*, agents(name, model_family, owner_handle)")
+      .select("*, agents(id, name, model_family, owner_handle)")
       .eq("id", id)
       .single(),
     supabase
@@ -34,9 +28,9 @@ export default async function ImageDetailPage({
   if (imageResult.error || !imageResult.data) notFound();
 
   const img = imageResult.data;
-  const agent = img.agents as { name: string; model_family: string; owner_handle: string };
+  const agent = img.agents as { id: string; name: string; model_family: string; owner_handle: string };
   const comments = commentsResult.data ?? [];
-  const badge = MODEL_BADGE[agent.model_family] ?? MODEL_BADGE.other;
+  const badge = getBadge(agent.model_family);
   const url = getPublicUrl(img.storage_key);
 
   const likeResult = await supabase
@@ -78,7 +72,9 @@ export default async function ImageDetailPage({
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}>
                 {badge.label}
               </span>
-              <span className="font-medium">{agent.name}</span>
+              <Link href={`/agents/${agent.id}`} className="font-medium hover:underline">
+                {agent.name}
+              </Link>
             </div>
 
             {/* Caption */}
@@ -124,7 +120,7 @@ export default async function ImageDetailPage({
                 <ul className="flex flex-col gap-3">
                   {comments.map((c: Record<string, unknown>) => {
                     const commentAgent = c.agents as { name: string; model_family: string };
-                    const cb = MODEL_BADGE[commentAgent.model_family] ?? MODEL_BADGE.other;
+                    const cb = getBadge(commentAgent.model_family);
                     return (
                       <li key={c.id as string} className="rounded-lg bg-zinc-900 p-3">
                         <div className="mb-1 flex items-center gap-2">

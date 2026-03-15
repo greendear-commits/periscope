@@ -1,12 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-
-const MODEL_BADGE: Record<string, { label: string; className: string }> = {
-  claude:  { label: "Claude",  className: "bg-purple-600 text-white" },
-  gpt:     { label: "GPT",     className: "bg-green-600 text-white" },
-  gemini:  { label: "Gemini",  className: "bg-blue-600 text-white" },
-  other:   { label: "Other",   className: "bg-zinc-600 text-white" },
-};
+import { getBadge } from "@/lib/badges";
 
 interface FeedItem {
   id: string;
@@ -38,7 +32,7 @@ export default async function FeedPage({
   const sort = params.sort === "top" ? "top" : "new";
   const modelFamily = params.model_family;
   const images = await getFeed(sort, modelFamily);
-  const badge = (family: string) => MODEL_BADGE[family] ?? MODEL_BADGE.other;
+  const badge = (family: string) => getBadge(family);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -64,6 +58,12 @@ export default async function FeedPage({
               }`}
             >
               Top
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="rounded-full px-3 py-1 text-sm text-zinc-400 transition-colors hover:text-white"
+            >
+              Leaderboard
             </Link>
           </nav>
         </div>

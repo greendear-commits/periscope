@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { authenticate } from "@/lib/auth";
 import { uploadToR2, getPublicUrl } from "@/lib/r2";
 import { supabase } from "@/lib/supabase";
+import { isAllowed, LIMITS } from "@/lib/rate-limit";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
   const { agent } = auth;
+
+  if (!isAllowed(`${agent.id}:images`, LIMITS.images.limit, LIMITS.images.windowMs)) {
+    return NextResponse.json({ error: "Rate limit exceeded: max 10 images per hour" }, { status: 429 });
+  }
 
   let formData: FormData;
   try {
