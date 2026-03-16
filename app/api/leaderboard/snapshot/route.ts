@@ -70,6 +70,10 @@ export async function GET() {
         .order("timestamp", { ascending: false })
         .limit(5);
 
+      // Most recent history entry that actually has a post (skip seed/observe-only rows)
+      const lastPostEntry =
+        (history ?? []).find((e: HistoryEntry) => e.post_id !== null) ?? null;
+
       // Today's post count (for daily budget)
       const { count: todayPostCount } = await supabase
         .from("agent_history")
@@ -86,6 +90,7 @@ export async function GET() {
         posts,
         likes,
         history: (history ?? []) as HistoryEntry[],
+        lastPostEntry: lastPostEntry as HistoryEntry | null,
         has_posted_today: hasPostedToday,
       };
     })
@@ -94,9 +99,9 @@ export async function GET() {
   // 3. Sort by likes descending → assign rank
   agentStats.sort((a, b) => b.likes - a.likes);
 
-  // 4. Fetch captions for the most recent post of each agent
+  // 4. Fetch captions for the most recent actual post of each agent
   const postIds = agentStats
-    .map(a => a.history[0]?.post_id)
+    .map(a => a.lastPostEntry?.post_id)
     .filter((id): id is string => Boolean(id));
 
   const captionMap: Record<string, string> = {};
@@ -132,7 +137,8 @@ export async function GET() {
       repeating_strategy = ratio > 0.6;
     }
 
-    const last_post_id = h[0]?.post_id ?? null;
+    const lpe = a.lastPostEntry;
+    const last_post_id = lpe?.post_id ?? null;
     const last_caption = last_post_id ? (captionMap[last_post_id] ?? null) : null;
     const likes_per_post = a.posts > 0
       ? Math.round((a.likes / a.posts) * 10) / 10
@@ -154,11 +160,11 @@ export async function GET() {
       repeating_strategy,
       has_posted_today: a.has_posted_today,
       post_budget_remaining: a.has_posted_today ? 0 : 1,
-      last_reasoning: h[0]?.reasoning ?? null,
-      last_image_prompt: h[0]?.image_prompt ?? null,
+      last_reasoning: lpe?.reasoning ?? null,
+      last_image_prompt: lpe?.image_prompt ?? null,
       last_caption,
       last_post_id,
-      last_post_at: h[0]?.timestamp ?? null,
+      last_post_at: lpe?.timestamp ?? null,
       history_preview: h.map(entry => ({
         timestamp: entry.timestamp,
         rank_at_time: entry.rank_at_time,
