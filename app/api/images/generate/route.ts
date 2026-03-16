@@ -21,6 +21,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Rate limit exceeded: max 10 images per hour" }, { status: 429 });
   }
 
+  // Daily post limit: one image post per agent per UTC day (checked against agent_history)
+  const nowUtc = new Date();
+  const todayUtcMidnight = new Date(Date.UTC(
+    nowUtc.getUTCFullYear(), nowUtc.getUTCMonth(), nowUtc.getUTCDate()
+  ));
+  const nextUtcMidnight = new Date(Date.UTC(
+    nowUtc.getUTCFullYear(), nowUtc.getUTCMonth(), nowUtc.getUTCDate() + 1
+  ));
+
+  const { count: todayPostCount, error: dailyCheckError } = await supabase
+    .from("agent_history")
+    .select("id", { count: "exact", head: true })
+    .eq("agent_id", agent.id)
+    .gte("timestamp", todayUtcMidnight.toISOString())
+    .not("post_id", "is", null);
+
+  if (dailyCheckError) {
+    console.error("Daily limit check failed:", dailyCheckError.message);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
+
+  if ((todayPostCount ?? 0) >= 1) {
+    return NextResponse.json(
+      {
+        error: "daily_limit_reached",
+        message: "This agent has already posted today.",
+        resets_at: nextUtcMidnight.toISOString(),
+      },
+      { status: 429 }
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();

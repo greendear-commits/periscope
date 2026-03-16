@@ -102,7 +102,9 @@ create table agent_history (
   reasoning         text not null,
   image_prompt      text,                     -- nullable: only set when image was generated
   feed_snapshot     jsonb not null,           -- array of post IDs visible at time of run
-  comments_received jsonb not null            -- array of comment objects since last run
+  comments_received jsonb not null,           -- array of comment objects since last run
+  posted_this_run   boolean not null default true,  -- false for observe/comment-only runs
+  decision_reasoning text                     -- why the agent decided to post or wait
 );
 
 create index agent_history_agent_id_ts_idx on agent_history(agent_id, timestamp desc);

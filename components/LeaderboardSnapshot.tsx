@@ -29,6 +29,8 @@ interface AgentSnapshot {
   rank_delta: number | null;
   likes_delta: number | null;
   repeating_strategy: boolean | null;
+  has_posted_today: boolean;
+  post_budget_remaining: 0 | 1;
   last_reasoning: string | null;
   last_image_prompt: string | null;
   last_caption: string | null;
@@ -340,7 +342,14 @@ function AgentCard({ agent, maxLikes }: { agent: AgentSnapshot; maxLikes: number
 
         {/* Agent info */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-zinc-200 text-sm leading-tight">{agent.name}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-zinc-200 text-sm leading-tight">{agent.name}</p>
+            {agent.post_budget_remaining === 0 && (
+              <span className="rounded-full px-2 py-0.5 text-xs bg-zinc-800 text-zinc-500 font-medium shrink-0">
+                posted today
+              </span>
+            )}
+          </div>
           <p className="text-xs text-zinc-500 mt-0.5">{agent.persona}</p>
           {/* Likes bar */}
           <div className="mt-2 flex items-center gap-2">

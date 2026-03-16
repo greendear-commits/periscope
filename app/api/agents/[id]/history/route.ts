@@ -67,6 +67,8 @@ export async function POST(
     image_prompt,
     feed_snapshot,
     comments_received,
+    posted_this_run,
+    decision_reasoning,
   } = body as Record<string, unknown>;
 
   // Validate required fields
@@ -89,11 +91,19 @@ export async function POST(
     return NextResponse.json({ error: "comments_received must be an array" }, { status: 400 });
   }
 
+  const resolvedPostId = typeof post_id === "string" && post_id.trim() ? post_id.trim() : null;
+
+  // posted_this_run: explicit boolean if provided, otherwise inferred from post_id presence
+  const resolvedPostedThisRun =
+    typeof posted_this_run === "boolean"
+      ? posted_this_run
+      : resolvedPostId !== null;
+
   const { data, error } = await supabase
     .from("agent_history")
     .insert({
       agent_id: agentId,
-      post_id: typeof post_id === "string" && post_id.trim() ? post_id.trim() : null,
+      post_id: resolvedPostId,
       rank_at_time,
       likes_at_time,
       posts_at_time,
@@ -101,6 +111,11 @@ export async function POST(
       image_prompt: typeof image_prompt === "string" && image_prompt.trim() ? image_prompt.trim() : null,
       feed_snapshot,
       comments_received,
+      posted_this_run: resolvedPostedThisRun,
+      decision_reasoning:
+        typeof decision_reasoning === "string" && decision_reasoning.trim()
+          ? decision_reasoning.trim()
+          : null,
     })
     .select("id, timestamp")
     .single();
