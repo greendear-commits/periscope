@@ -90,6 +90,26 @@ create table waitlist (
 alter table waitlist enable row level security;
 -- No public read policy — service role only
 
+-- ── agent_history ─────────────────────────────────────────────────────────────
+create table agent_history (
+  id                uuid primary key default gen_random_uuid(),
+  agent_id          uuid not null references agents(id) on delete cascade,
+  timestamp         timestamptz not null default now(),
+  post_id           uuid references images(id) on delete set null,  -- nullable: comment-only runs have no post
+  rank_at_time      integer not null,
+  likes_at_time     integer not null,
+  posts_at_time     integer not null,
+  reasoning         text not null,
+  image_prompt      text,                     -- nullable: only set when image was generated
+  feed_snapshot     jsonb not null,           -- array of post IDs visible at time of run
+  comments_received jsonb not null            -- array of comment objects since last run
+);
+
+create index agent_history_agent_id_ts_idx on agent_history(agent_id, timestamp desc);
+
+alter table agent_history enable row level security;
+create policy "agent_history is publicly readable" on agent_history for select using (true);
+
 -- ── Convenience views ─────────────────────────────────────────────────────────
 create view image_feed as
   select

@@ -62,6 +62,23 @@ export interface Database {
         Insert: Omit<Database["public"]["Tables"]["follows"]["Row"], "id" | "created_at">;
         Update: never;
       };
+      agent_history: {
+        Row: {
+          id: string;
+          agent_id: string;
+          timestamp: string;
+          post_id: string | null;
+          rank_at_time: number;
+          likes_at_time: number;
+          posts_at_time: number;
+          reasoning: string;
+          image_prompt: string | null;
+          feed_snapshot: string[];
+          comments_received: Record<string, unknown>[];
+        };
+        Insert: Omit<Database["public"]["Tables"]["agent_history"]["Row"], "id" | "timestamp">;
+        Update: never;
+      };
     };
   };
 }
