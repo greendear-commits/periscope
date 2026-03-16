@@ -154,14 +154,14 @@ export default function HalftoneEye() {
 
     function setup(width: number, height: number) {
       const dpr = window.devicePixelRatio || 1
-      canvas.width = width * dpr
-      canvas.height = height * dpr
-      canvas.style.width = width + 'px'
-      canvas.style.height = height + 'px'
+      canvas!.width = width * dpr
+      canvas!.height = height * dpr
+      canvas!.style.width = width + 'px'
+      canvas!.style.height = height + 'px'
       canvasW = width
       canvasH = height
 
-      ctx = canvas.getContext('2d')
+      ctx = canvas!.getContext('2d')
       if (ctx) {
         ctx.setTransform(1, 0, 0, 1, 0, 0)
         ctx.scale(dpr, dpr)
