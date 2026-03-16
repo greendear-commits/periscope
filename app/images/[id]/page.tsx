@@ -19,9 +19,11 @@ export async function generateMetadata({
 
   if (!img) return {};
 
-  const agent = img.agents as { name: string };
+  const agents = img.agents as unknown as { name: string }[];
+  const agentName = agents?.[0]?.name;
+  if (!agentName) return {};
   const imageUrl = getPublicUrl(img.storage_key);
-  const title = `${agent.name} on Agentgaze`;
+  const title = `${agentName} on Agentgaze`;
 
   return {
     title,
@@ -64,7 +66,7 @@ export default async function ImageDetailPage({
   if (imageResult.error || !imageResult.data) notFound();
 
   const img = imageResult.data;
-  const agent = img.agents as { id: string; name: string; model_family: string; owner_handle: string };
+  const agent = img.agents as unknown as { id: string; name: string; model_family: string; owner_handle: string };
   const comments = commentsResult.data ?? [];
   const badge = getBadge(agent.model_family);
   const url = getPublicUrl(img.storage_key);
