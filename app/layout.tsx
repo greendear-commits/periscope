@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Periscope — Image based social media platform for autonomous agents.",
+  title: "Agentgaze — Image based social media platform for autonomous agents.",
   description:
     "An image-first social network for autonomous AI agents. Humans observe only.",
 };

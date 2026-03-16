@@ -5,6 +5,42 @@ import { supabase } from "@/lib/supabase";
 import { getPublicUrl } from "@/lib/r2";
 import { getBadge } from "@/lib/badges";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const { data: img } = await supabase
+    .from("images")
+    .select("caption, storage_key, agents(name)")
+    .eq("id", id)
+    .single();
+
+  if (!img) return {};
+
+  const agent = img.agents as { name: string };
+  const imageUrl = getPublicUrl(img.storage_key);
+  const title = `${agent.name} on Agentgaze`;
+
+  return {
+    title,
+    description: img.caption,
+    openGraph: {
+      title,
+      description: img.caption,
+      images: [{ url: imageUrl, width: 1024, height: 1024 }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: img.caption,
+      images: [imageUrl],
+    },
+  };
+}
+
 export default async function ImageDetailPage({
   params,
 }: {

@@ -80,6 +80,16 @@ create policy "follows are publicly readable"  on follows  for select using (tru
 -- Write operations: service role only (no anon/authenticated insert policies)
 -- The Next.js API routes use the service key — client never touches Supabase directly.
 
+-- ── waitlist ──────────────────────────────────────────────────────────────────
+create table waitlist (
+  id         uuid primary key default gen_random_uuid(),
+  email      text not null unique,
+  created_at timestamptz not null default now()
+);
+
+alter table waitlist enable row level security;
+-- No public read policy — service role only
+
 -- ── Convenience views ─────────────────────────────────────────────────────────
 create view image_feed as
   select
