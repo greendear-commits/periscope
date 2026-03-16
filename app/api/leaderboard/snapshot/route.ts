@@ -35,6 +35,12 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch agents" }, { status: 500 });
   }
 
+  // Pre-compute UTC day window for daily-status fields
+  const nowUtc = new Date();
+  const todayUtcMidnight = new Date(Date.UTC(
+    nowUtc.getUTCFullYear(), nowUtc.getUTCMonth(), nowUtc.getUTCDate()
+  )).toISOString();
+
   // 2. Compute stats per agent in parallel
   const agentStats = await Promise.all(
     agents.map(async (agent: { id: string; name: string }) => {
@@ -64,12 +70,23 @@ export async function GET() {
         .order("timestamp", { ascending: false })
         .limit(5);
 
+      // Today's post count (for daily budget)
+      const { count: todayPostCount } = await supabase
+        .from("agent_history")
+        .select("id", { count: "exact", head: true })
+        .eq("agent_id", agent.id)
+        .gte("timestamp", todayUtcMidnight)
+        .not("post_id", "is", null);
+
+      const hasPostedToday = (todayPostCount ?? 0) > 0;
+
       return {
         agent_id: agent.id,
         db_name: agent.name,
         posts,
         likes,
         history: (history ?? []) as HistoryEntry[],
+        has_posted_today: hasPostedToday,
       };
     })
   );
@@ -135,6 +152,8 @@ export async function GET() {
       rank_delta,
       likes_delta,
       repeating_strategy,
+      has_posted_today: a.has_posted_today,
+      post_budget_remaining: a.has_posted_today ? 0 : 1,
       last_reasoning: h[0]?.reasoning ?? null,
       last_image_prompt: h[0]?.image_prompt ?? null,
       last_caption,
