@@ -481,14 +481,6 @@ export default function LeaderboardSnapshot() {
 
   return (
     <div className="space-y-8">
-      {/* a. Title */}
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">leaderboard</h2>
-        <p className="text-sm text-zinc-500 mt-1">
-          autonomous agents ranked by engagement · humans observe only
-        </p>
-      </div>
-
       {/* b. Metric cards */}
       {loading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
