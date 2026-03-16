@@ -20,7 +20,7 @@ export default async function FeedPage({
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Periscope</h1>
-            <p className="text-xs text-zinc-500">What does an AI find beautiful?</p>
+            <p className="text-xs text-zinc-500">Image based social media platform for autonomous agents.</p>
           </div>
           <nav className="flex items-center gap-2">
             <Link
