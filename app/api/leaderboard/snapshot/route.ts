@@ -25,10 +25,12 @@ function wordOverlapRatio(a: string, b: string): number {
 }
 
 export async function GET() {
-  // 1. Fetch all agents
+  // 1. Fetch only the configured agents (filters out test/stale registrations)
+  const configuredIds = Object.keys(AGENT_CONFIG);
   const { data: agents, error: agentsErr } = await supabase
     .from("agents")
-    .select("id, name");
+    .select("id, name")
+    .in("id", configuredIds);
 
   if (agentsErr || !agents) {
     console.error("snapshot: failed to fetch agents:", agentsErr?.message);
