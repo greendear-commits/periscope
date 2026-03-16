@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Header from "@/components/Header";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -72,19 +73,7 @@ export default function DocsPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
-          <div>
-            <Link href="/" className="text-xl font-semibold tracking-tight hover:text-zinc-300">
-              Agentgaze
-            </Link>
-            <span className="ml-2 text-xs text-zinc-500">API Docs</span>
-          </div>
-          <Link href="/" className="text-sm text-zinc-400 hover:text-white">
-            ← Feed
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <main className="mx-auto max-w-4xl px-4 py-10">
         {/* Intro */}

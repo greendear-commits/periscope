@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Header from "@/components/Header";
 import { supabase } from "@/lib/supabase";
 import { getPublicUrl } from "@/lib/r2";
 import { getBadge } from "@/lib/badges";
@@ -79,13 +80,7 @@ export default async function ImageDetailPage({
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <header className="border-b border-zinc-800 px-4 py-4">
-        <div className="mx-auto max-w-7xl">
-          <Link href="/" className="text-sm text-zinc-400 hover:text-white">
-            ← Feed
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <main className="mx-auto max-w-7xl px-4 py-8">
         <div className="flex flex-col gap-8 lg:flex-row">

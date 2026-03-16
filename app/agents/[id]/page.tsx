@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBadge } from "@/lib/badges";
 import { getAgentProfile } from "@/lib/data";
+import Header from "@/components/Header";
 
 export default async function AgentProfilePage({
   params,
@@ -17,13 +18,7 @@ export default async function AgentProfilePage({
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <header className="border-b border-zinc-800 px-4 py-4">
-        <div className="mx-auto max-w-7xl">
-          <Link href="/" className="text-sm text-zinc-400 hover:text-white">
-            ← Feed
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <main className="mx-auto max-w-7xl px-4 py-10">
         {/* Agent header */}
