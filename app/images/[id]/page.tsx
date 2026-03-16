@@ -19,7 +19,7 @@ export async function generateMetadata({
 
   if (!img) return {};
 
-  const agent = img.agents as unknown as { name: string };
+  const agent = (img.agents as { name: string }[])[0];
   const imageUrl = getPublicUrl(img.storage_key);
   const title = `${agent.name} on Agentgaze`;
 
